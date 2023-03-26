@@ -1,0 +1,59 @@
+service: poc-serverless-step-func
+
+frameworkVersion: '3'
+
+plugins:
+  - serverless-step-functions
+
+provider:
+  name: aws
+  runtime: python3.8
+  stage: test
+  region: ap-southeast-1
+  iam:
+    role:
+      name: ${self:service}-${self:provider.stage}
+
+package:
+ patterns:
+   - '!exclude-me.py'
+   - '!exclude-me-dir/**'
+   - include-me.py
+   - include-me-dir/**
+
+functions:
+  hello:
+    handler: handler.hello
+  good_bye:
+    handler: handler.good_bye
+
+stepFunctions:
+  stateMachines:
+    hellostepfunc1:
+      events:
+        - schedule:
+            rate: rate(5 minutes)
+            enabled: true
+      name: poc-serverless-step-func
+      definition:
+        Comment: "A Hello World example of the Amazon States Language using an AWS Lambda Function"
+        StartAt: HelloWorld
+        States:
+          HelloWorld:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [hello, Arn]
+            TimeoutSeconds: 10
+            Catch:
+            - ErrorEquals: ["States.Timeout"]
+              Next: GoodBye
+            End: true
+          GoodBye:
+            Type: Task
+            Resource:
+              Fn::GetAtt: [good_bye, Arn]
+            End: true
+  activities:
+    - myTask
+    - yourTask
+  validate: true # enable pre-deployment definition validation (disabled by default)
