@@ -5,6 +5,9 @@
   "repository": "git@github.com:kaotu/poc-serverless-step-func.git",
   "author": "kaotu <kaotu09@gmail.com>",
   "license": "MIT",
+  "scripts": {
+    "deploy": "sls deploy --stage test"
+  },
   "devDependencies": {
     "serverless": "^3.29.0",
     "serverless-step-functions": "^3.13.0"
